@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router';
+import Helper from '../_helper/helper';
 
 class FotoAtualizacoes extends Component {
-    render(){
-        return (
-            <section className="fotoAtualizacoes">
-              <a href="#" className="fotoAtualizacoes-like">Likar</a>
-              <form className="fotoAtualizacoes-form">
-                <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo"/>
-                <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit"/>
-              </form>
-            </section>
-        );
-    }
+  render(){
+      return (
+          <section className="fotoAtualizacoes">
+            <a className="fotoAtualizacoes-lik">Likar</a>
+            <form className="fotoAtualizacoes-form">
+              <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo"/>
+              <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit"/>
+            </form>
+          </section>
+      );
+  }
 }
 
 class FotoInfo extends Component {
@@ -21,7 +23,7 @@ class FotoInfo extends Component {
               <div className="foto-info-likes">
                 {
                   this.props.foto.likers.map(liker => {
-                    return <a key={liker.login} href="#">{liker.login},</a>
+                    return <Link to={`/timeline/${liker.login}`} key={liker.login}>{liker.login},</Link>
                   })
                 }
 
@@ -38,7 +40,7 @@ class FotoInfo extends Component {
                 {
                   this.props.foto.comentarios.map(comentario => 
                     <li key={comentario.id} className="comentario">
-                      <a className="foto-info-autor">{comentario.login} </a>
+                      <Link to={`/timeline/${comentario.login}`} className="foto-info-autor">{comentario.login} </Link>
                       {comentario.texto}
                     </li>)
                 }
@@ -55,9 +57,9 @@ class FotoHeader extends Component {
               <figure className="foto-usuario">
               <img src={this.props.foto.urlPerfil} alt="foto do usuario" />
                 <figcaption className="foto-usuario">
-                  <a href="#">
+                  <Link to={`/timeline/${this.props.foto.loginUsuario}`}>
                     {this.props.foto.loginUsuario}
-                  </a>  
+                  </Link>  
                 </figcaption>
               </figure>
             <time className="foto-data">{this.props.foto.horario}</time>
@@ -72,8 +74,8 @@ export default class Foto extends Component {
           <div className="foto">
             <FotoHeader foto={this.props.foto} />
             <img alt="foto" className="foto-src" src={this.props.foto.urlFoto}/>
-            <FotoInfo foto={this.props.foto}/>
-            <FotoAtualizacoes/>
+            <FotoInfo foto={this.props.foto} />
+            <FotoAtualizacoes foto={this.props.foto} />
           </div>            
         );
     }

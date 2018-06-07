@@ -4,19 +4,42 @@ import Foto from './Foto';
 
 export default class Timeline extends Component {
 
-    constructor() {
-        super();
+    constructor(prosp) {
+        super(prosp);
         this.state = {
             fotos: [],
         };
+
+        this.login = this.props.login;
     }
 
+    // dispara quando o componete será instanciado
     componentDidMount() {
-        this._loadFotos()
+        this._loadFotos();
+    }
+    
+    // dispara quando uma propriedade é alterada
+    componentWillReceibeProps(nextProps) {
+        if (nextProps.login !== undefined) {
+            this.login = nextProps.login;
+            this._loadFotos();
+        }
+    }
+
+    _loadFotos() {
+        let urlPerfil;
+
+        if (this.login === undefined) {
+            urlPerfil = `${Helper.urlApi}/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+        } else {
+            urlPerfil = `${Helper.urlApi}/public/fotos/${this.login}`;
+        }
+
+        fetch(urlPerfil)
             .then(response => response.json())
             .then(fotos => {
                 this._setFotos(fotos);
-            })
+            });
     }
 
     _setFotos(fotos) {
@@ -43,14 +66,11 @@ export default class Timeline extends Component {
                     }
                 ]
             }
-        ]
+        ];
+        
         this.setState({
             fotos: fotos.length > 4 ? fotos.slice(0, 5) : fotos,
         });
-    }
-
-    _loadFotos() {
-        return fetch(`${Helper.urlApi}/posts?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`);
     }
 
     render() {
