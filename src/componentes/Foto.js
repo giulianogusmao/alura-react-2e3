@@ -3,10 +3,40 @@ import { Link } from 'react-router';
 import Helper from '../_helper/helper';
 
 class FotoAtualizacoes extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      likeada: this.props.foto.likeada
+    };
+  }
+
+  like(event) {
+    event.preventDefault();
+
+    fetch(`${Helper.urlApi}/like`, { method: 'POST' })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Não foi possível realizar o like da foto')
+        }
+      })
+      .then(liker => {
+        this.setState({
+          likeada: !this.state.likeada
+        })
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
   render(){
       return (
           <section className="fotoAtualizacoes">
-            <a className="fotoAtualizacoes-lik">Likar</a>
+          <a onClick={this.like.bind(this)} className={'fotoAtualizacoes-like' + (this.state.likeada ? ' active' : '') }>Likar</a>
             <form className="fotoAtualizacoes-form">
               <input type="text" placeholder="Adicione um comentário..." className="fotoAtualizacoes-form-campo"/>
               <input type="submit" value="Comentar!" className="fotoAtualizacoes-form-submit"/>
