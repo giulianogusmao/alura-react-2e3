@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
+import PubSub from 'pubsub-js';
 import Helper from '../_helper/helper';
 
 class FotoAtualizacoes extends Component {
@@ -10,6 +11,14 @@ class FotoAtualizacoes extends Component {
     this.state = {
       likeada: this.props.foto.likeada
     };
+  }
+
+  _toggleLike(liker) {
+    this.setState({
+      likeada: !this.state.likeada
+    });
+
+    PubSub.publish('atualiza-liker', { fotoId: this.props.foto.id, liker });
   }
 
   like(event) {
@@ -24,11 +33,10 @@ class FotoAtualizacoes extends Component {
         }
       })
       .then(liker => {
-        this.setState({
-          likeada: !this.state.likeada
-        })
+        this._toggleLike(liker);
       })
       .catch(err => {
+        // this._toggleLike({ login: this.props.foto.loginUsuario });
         console.error(err);
       });
   }
@@ -47,13 +55,46 @@ class FotoAtualizacoes extends Component {
 }
 
 class FotoInfo extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      likers: this.props.foto.likers,
+    };
+  }
+
+  // antes do render ser chamado
+  componentWillMount() {
+    PubSub.subscribe('atualiza-liker', (topico, infoLiker) => {
+      if (this.props.foto.id === infoLiker.fotoId) {
+        const possivelLiker = this.state.likers.find(liker => liker.login === infoLiker.liker.login);
+
+        if (possivelLiker === undefined) {
+          // caso não tenha encontrado o liker adiciona na lista de likers
+          
+          /* ATENÇÂO
+           * Exemplo de aplicação imutável concatenando os itens e depois aplicando no state, 
+           * desta forma não alterar diretamente o objeto.
+           */
+          const novosLikers = this.state.likers.concat(infoLiker.liker);
+          this.setState({ likers: novosLikers });
+        } else {
+          // remove da lista de likers
+          const novosLikers = this.state.likers.filter(liker => liker.login !== infoLiker.liker.login);
+          this.setState({ likers: novosLikers });
+        }
+      }
+    });
+  }
+  
     render(){
         return (
             <div className="foto-in fo">
               <div className="foto-info-likes">
                 {
-                  this.props.foto.likers.map(liker => {
-                    return <Link to={`/timeline/${liker.login}`} key={liker.login}>{liker.login},</Link>
+                  this.state.likers.map(liker => {
+                    return <Link to={`/timeline/${liker.login}`} key={liker.login}>{liker.login}, </Link>
                   })
                 }
 
