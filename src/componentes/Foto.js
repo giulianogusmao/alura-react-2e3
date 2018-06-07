@@ -21,7 +21,7 @@ class FotoInfo extends Component {
               <div className="foto-info-likes">
                 {
                   this.props.foto.likers.map(liker => {
-                    return <a href="#">{liker.login},</a>
+                    return <a key={liker.login} href="#">{liker.login},</a>
                   })
                 }
 

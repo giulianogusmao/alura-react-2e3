@@ -20,6 +20,7 @@ export default class Timeline extends Component {
     }
 
     _setFotos(fotos) {
+        // fake data
         fotos = [
             {
                 urlPerfil: 'http://images.uncyc.org/pt/thumb/a/a8/Mr._Bean_realmeme.jpg/170px-Mr._Bean_realmeme.jpg',
@@ -31,10 +32,12 @@ export default class Timeline extends Component {
                 likers: [],
                 comentarios: [
                     {
+                        id: 1,
                         login: 'alots',
                         texto: 'Muito top cara!'
                     },
                     {
+                        id: 2,
                         login: 'Lucão',
                         texto: 'Ce é bichão mesmo hein doido'
                     }
@@ -47,7 +50,7 @@ export default class Timeline extends Component {
     }
 
     _loadFotos() {
-        return fetch(`${Helper.urlApi}/posts`);
+        return fetch(`${Helper.urlApi}/posts?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`);
     }
 
     render() {
