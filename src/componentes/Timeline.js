@@ -20,6 +20,31 @@ export default class Timeline extends Component {
         PubSub.subscribe('timeline', (topico, fotos) => {
             this._setFotos(fotos);
         });
+
+        // Atualiza lista de curtidas
+        PubSub.subscribe('atualiza-liker', (topico, infoLiker) => {
+            const fotoAchada = this.state.fotos.find(foto => foto.id === infoLiker.fotoId);
+            const possivelLiker = fotoAchada.likers.find(liker => liker.login === infoLiker.liker.login);
+            fotoAchada.likeada = !fotoAchada.likeada;
+
+            if (possivelLiker === undefined) {
+                // caso não tenha encontrado o liker adiciona na lista de likers
+                fotoAchada.likers.push(infoLiker.liker);
+            } else {
+                // remove da lista de likers
+                fotoAchada.likers = fotoAchada.likers.filter(liker => liker.login !== infoLiker.liker.login);
+            }
+            this.setState({ fotos: this.state.fotos });
+        });
+
+        // Atualiza lista de comentários
+        PubSub.subscribe('novos-comentarios', (topico, comentario) => {
+            const fotoAchada = this.state.fotos.find(foto => foto.id === comentario.fotoId);
+            fotoAchada.comentarios.push(comentario.novoComentario);
+            this.setState({
+                fotos: this.state.fotos
+            });
+        });
     }
 
     // dispara quando o componete será instanciado
@@ -39,7 +64,7 @@ export default class Timeline extends Component {
         let urlPerfil;
 
         if (this.login === undefined) {
-            urlPerfil = `${Helper.urlApi}/fotos?X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+            urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}}`;
         } else {
             urlPerfil = `${Helper.urlApi}/public/fotos/${this.login}`;
         }
@@ -95,7 +120,7 @@ export default class Timeline extends Component {
             })
             .catch(err => {
                 // fake comentario
-                // PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
+                PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
                 console.error(err);
             });
     }
@@ -122,7 +147,7 @@ export default class Timeline extends Component {
             })
             .catch(err => {
                 // fake comentario
-                // PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt(Math.random() * 100), login: 'Mr. Been', texto: comentario } });
+                PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt((Math.random() * 100), 10), login: 'Mr. Been', texto: comentario } });
                 console.error(err);
             });
     }
