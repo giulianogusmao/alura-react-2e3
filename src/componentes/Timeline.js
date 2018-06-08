@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Helper from '../_helper/helper';
 import Foto from './Foto';
+import PubSub from 'pubsub-js';
 
 export default class Timeline extends Component {
 
@@ -11,6 +12,13 @@ export default class Timeline extends Component {
         };
 
         this.login = this.props.login;
+    }
+
+    // dispara antes do componente ser instanciado
+    componentWillMount() {
+        PubSub.subscribe('timeline', (topico, fotos) => {
+            this._setFotos(fotos);
+        });
     }
 
     // dispara quando o componete será instanciado
