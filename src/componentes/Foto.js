@@ -157,12 +157,11 @@ class FotoInfo extends Component {
 
         <ul className="foto-info-comentarios">
           {
-            this.state.comentarios.map(comentario => {
-              console.log(comentario);
-              return <li key={comentario.id} className="comentario">
+            this.state.comentarios.map(comentario =>
+              <li key={comentario.id} className="comentario">
                 <Link to={`/timeline/${comentario.login}`} className="foto-info-autor">{comentario.login} </Link>
                 {comentario.texto}
-              </li>})
+              </li>)
           }
         </ul>
       </div>            

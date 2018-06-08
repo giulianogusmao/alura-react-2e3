@@ -19,6 +19,30 @@ export default class Header extends Component {
         PubSub.publish('timeline', fotos);
       })
       .catch(err => {
+        // fake data
+        // PubSub.publish('timeline', [
+        //     {
+        //       urlPerfil: 'http://images.uncyc.org/pt/thumb/a/a8/Mr._Bean_realmeme.jpg/170px-Mr._Bean_realmeme.jpg',
+        //       loginUsuario: 'Mr. Been',
+        //       horario: '05/12/2016 16:21',
+        //     urlFoto: 'https://4.bp.blogspot.com/-Lc0wsSOKqyY/WX-_tG2jJ5I/AAAAAAAAAI4/sWIQOcJ4-4UGGpMb9-djUwRSShZVPpIiwCLcBGAs/s1600/bin-Walther-Alvarenga.jpg',
+        //       id: 65,
+        //       likeada: true,
+        //       likers: [
+        //         {
+        //           id: 1,
+        //           login: 'alots',                  
+        //         }
+        //       ],
+        //       comentarios: [
+        //         {
+        //           id: 1,
+        //           login: 'alots',
+        //           texto: 'Muito top cara!'
+        //         },
+        //       ]
+        //     }
+        //   ]);
         console.error(err);
       });
   }
@@ -39,7 +63,7 @@ export default class Header extends Component {
         <nav>
           <ul className="header-nav">
             <li className="header-nav-item">
-              <a href="#">
+              <a>
                 ♡
                   {/*                 ♥ */}
                 {/* Quem deu like nas minhas fotos */}
