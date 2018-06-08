@@ -8,4 +8,8 @@ export default class Helper {
     static get urlApi() {
         return this._urlApi;
     }
+
+    static get authToken() {
+        return `X-AUTH-TOKEN=${localStorage.getItem('auth-token')}`;
+    }
 }

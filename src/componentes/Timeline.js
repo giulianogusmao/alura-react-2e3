@@ -26,7 +26,7 @@ export default class Timeline extends Component {
     componentDidMount() {
         this._loadFotos();
     }
-    
+
     // dispara quando uma propriedade é alterada
     componentWillReceibeProps(nextProps) {
         if (nextProps.login !== undefined) {
@@ -81,6 +81,52 @@ export default class Timeline extends Component {
         });
     }
 
+    like(fotoId) {
+        fetch(`${Helper.urlApi}/fotos/${fotoId}/like?${Helper.authToken}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Não foi possível realizar o like da foto')
+                }
+            })
+            .then(liker => {
+                PubSub.publish('atualiza-liker', { fotoId, liker });
+            })
+            .catch(err => {
+                // fake comentario
+                // PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
+                console.error(err);
+            });
+    }
+
+    comenta(fotoId, comentario) {
+        const requestInfo = {
+            method: 'POST',
+            body: JSON.stringify({ texto: comentario }),
+            headers: new Headers({
+                'Content-type': 'application/json',
+            }),
+        };
+
+        fetch(`${Helper.urlApi}/fotos/${fotoId}/comment?${Helper.authToken}}`, requestInfo)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Não foi possível comentar na foto');
+                }
+            })
+            .then(novoComentario => {
+                PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario });
+            })
+            .catch(err => {
+                // fake comentario
+                // PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt(Math.random() * 100), login: 'Mr. Been', texto: comentario } });
+                console.error(err);
+            });
+    }
+
     render() {
         return (
             <div className="fotos container">
@@ -89,7 +135,7 @@ export default class Timeline extends Component {
                     transitionEnterTimeout={500}
                     transitionLeaveTimeout={300}>
                     {
-                        this.state.fotos.map(foto => <Foto key={foto.id} foto={foto} />)
+                        this.state.fotos.map(foto => <Foto key={foto.id} foto={foto} like={this.like} comenta={this.comenta} />)
                     }
                 </ReactCSSTransitionGroup>
             </div>
