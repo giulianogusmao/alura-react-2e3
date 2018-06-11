@@ -53,7 +53,7 @@ export default class Timeline extends Component {
     }
 
     // dispara quando uma propriedade é alterada
-    componentWillReceibeProps(nextProps) {
+    componentWillReceiveProps(nextProps) {
         if (nextProps.login !== undefined) {
             this.login = nextProps.login;
             this._loadFotos();
@@ -64,7 +64,7 @@ export default class Timeline extends Component {
         let urlPerfil;
 
         if (this.login === undefined) {
-            urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}}`;
+            urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}`;
         } else {
             urlPerfil = `${Helper.urlApi}/public/fotos/${this.login}`;
         }
@@ -72,37 +72,21 @@ export default class Timeline extends Component {
         fetch(urlPerfil)
             .then(response => response.json())
             .then(fotos => {
-                // fake data
-                fotos = [
-                    {
-                        urlPerfil: 'http://images.uncyc.org/pt/thumb/a/a8/Mr._Bean_realmeme.jpg/170px-Mr._Bean_realmeme.jpg',
-                        loginUsuario: 'Mr. Been',
-                        horario: '05/12/2016 16:21',
-                        urlFoto: 'https://malaysianaccess.com/wp-content/uploads/Mr-Bean.jpg',
-                        id: 3,
-                        likeada: false,
-                        likers: [],
-                        comentarios: [
-                            {
-                                id: 1,
-                                login: 'alots',
-                                texto: 'Muito top cara!'
-                            },
-                            {
-                                id: 2,
-                                login: 'Lucão',
-                                texto: 'Ce é bichão mesmo hein doido'
-                            }
-                        ]
-                    }
-                ];
-                this._setFotos(fotos);
+                if (Array.isArray(fotos)) {
+                    this._setFotos(fotos);
+                } else {
+                    throw new Error(fotos);
+                }
+            })
+            .catch(err => {
+                console.error('Não foi possível carregar a timeline');
+                console.error(JSON.stringify(err.message));
             });
     }
 
     _setFotos(fotos) {
         this.setState({
-            fotos: fotos.length > 4 ? fotos.slice(0, 5) : fotos,
+            fotos: [].concat(fotos),
         });
     }
 
@@ -120,7 +104,7 @@ export default class Timeline extends Component {
             })
             .catch(err => {
                 // fake comentario
-                PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
+                // PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
                 console.error(err);
             });
     }
@@ -134,7 +118,7 @@ export default class Timeline extends Component {
             }),
         };
 
-        fetch(`${Helper.urlApi}/fotos/${fotoId}/comment?${Helper.authToken}}`, requestInfo)
+        fetch(`${Helper.urlApi}/fotos/${fotoId}/comment?${Helper.authToken}`, requestInfo)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -147,7 +131,7 @@ export default class Timeline extends Component {
             })
             .catch(err => {
                 // fake comentario
-                PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt((Math.random() * 100), 10), login: 'Mr. Been', texto: comentario } });
+                // PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt((Math.random() * 100), 10), login: 'Mr. Been', texto: comentario } });
                 console.error(err);
             });
     }

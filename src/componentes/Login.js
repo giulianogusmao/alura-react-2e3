@@ -29,7 +29,7 @@ export default class Login extends Component {
             }),
         }
 
-        fetch(`${Helper.urlApi}/posts`, requestInfo)
+        fetch(`${Helper.urlApi}/public/login`, requestInfo)
             .then(response => {
                 if (response.ok) {
                     return response.text();
@@ -39,11 +39,11 @@ export default class Login extends Component {
                 }
             })
             .then(token => {
-                localStorage.setItem('auth-token', 'aisjl13K2Mc13OXI4JXo5ijX7a1sd2')
+                Helper.authToken = token;
                 browserHistory.push('/timeline');
             })
             .catch(err => {
-                this._setMsg(err);
+                this._setMsg(err.message);
             });
     }
 
@@ -53,8 +53,13 @@ export default class Login extends Component {
                 <h1 className="header-logo">Instalura</h1>
                 <form onSubmit={this.enviaForm.bind(this)}>
                     <span className="text-msg">{this.state.msg}</span>
-                    <input type="text" ref={input => this.login = input} />
-                    <input type="password" ref={input => this.senha = input} />
+                    <input type="text" ref={(input) => this.login = input} placeholder="Login: alots" />
+                    <input type="password" ref={(input) => this.senha = input} placeholder="Senha: 123456" />
+                    {/* 
+                        usuário = alots, senha = 123456;
+                        usuário = rafael, senha = 123456;
+                        usuário = vitor, senha = 123456 
+                    */}
                     <input type="submit" value="login" />
                 </form>
             </div>
