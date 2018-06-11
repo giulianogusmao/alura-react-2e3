@@ -3,6 +3,7 @@ import Helper from '../_helper/helper';
 import Foto from './Foto';
 import PubSub from 'pubsub-js';
 import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import LogicaTimeLine from '../_logicas/LogicaTimeLine';
 
 export default class Timeline extends Component {
 
@@ -13,6 +14,7 @@ export default class Timeline extends Component {
         };
 
         this.login = this.props.login;
+        this.LogicaTimeLine = new LogicaTimeLine();
     }
 
     // dispara antes do componente ser instanciado
@@ -23,18 +25,6 @@ export default class Timeline extends Component {
 
         // Atualiza lista de curtidas
         PubSub.subscribe('atualiza-liker', (topico, infoLiker) => {
-            const fotoAchada = this.state.fotos.find(foto => foto.id === infoLiker.fotoId);
-            const possivelLiker = fotoAchada.likers.find(liker => liker.login === infoLiker.liker.login);
-            fotoAchada.likeada = !fotoAchada.likeada;
-
-            if (possivelLiker === undefined) {
-                // caso não tenha encontrado o liker adiciona na lista de likers
-                fotoAchada.likers.push(infoLiker.liker);
-            } else {
-                // remove da lista de likers
-                fotoAchada.likers = fotoAchada.likers.filter(liker => liker.login !== infoLiker.liker.login);
-            }
-            this.setState({ fotos: this.state.fotos });
         });
 
         // Atualiza lista de comentários
@@ -88,25 +78,28 @@ export default class Timeline extends Component {
         this.setState({
             fotos: [].concat(fotos),
         });
+        this.LogicaTimeLine = new LogicaTimeLine(this.state.fotos);
     }
 
     like(fotoId) {
-        fetch(`${Helper.urlApi}/fotos/${fotoId}/like?${Helper.authToken}`, { method: 'POST' })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Não foi possível realizar o like da foto')
-                }
-            })
-            .then(liker => {
-                PubSub.publish('atualiza-liker', { fotoId, liker });
-            })
-            .catch(err => {
-                // fake comentario
-                // PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
-                console.error(err);
-            });
+        this.LogicaTimeLine.like(fotoId);
+
+        // fetch(`${Helper.urlApi}/fotos/${fotoId}/like?${Helper.authToken}`, { method: 'POST' })
+        //     .then(response => {
+        //         if (response.ok) {
+        //             return response.json();
+        //         } else {
+        //             throw new Error('Não foi possível realizar o like da foto')
+        //         }
+        //     })
+        //     .then(liker => {
+        //         PubSub.publish('atualiza-liker', { fotoId, liker });
+        //     })
+        //     .catch(err => {
+        //         // fake comentario
+        //         // PubSub.publish('atualiza-liker', { fotoId, liker: { login: 'Mr. Been' } });
+        //         console.error(err);
+        //     });
     }
 
     comenta(fotoId, comentario) {
@@ -144,7 +137,7 @@ export default class Timeline extends Component {
                     transitionEnterTimeout={500}
                     transitionLeaveTimeout={300}>
                     {
-                        this.state.fotos.map(foto => <Foto key={foto.id} foto={foto} like={this.like} comenta={this.comenta} />)
+                        this.state.fotos.map(foto => <Foto key={foto.id} foto={foto} like={this.like.bind(this)} comenta={this.comenta.bind(this)} />)
                     }
                 </ReactCSSTransitionGroup>
             </div>
