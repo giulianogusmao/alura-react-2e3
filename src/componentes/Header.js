@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
 import Helper from '../_helper/helper';
 
 export default class Header extends Component {
@@ -16,33 +15,9 @@ export default class Header extends Component {
         }
       }) 
       .then(fotos => {
-        PubSub.publish('timeline', fotos);
+        console.log(fotos);
       })
       .catch(err => {
-        // fake data
-        // PubSub.publish('timeline', [
-        //     {
-        //       urlPerfil: 'http://images.uncyc.org/pt/thumb/a/a8/Mr._Bean_realmeme.jpg/170px-Mr._Bean_realmeme.jpg',
-        //       loginUsuario: 'Mr. Been',
-        //       horario: '05/12/2016 16:21',
-        //     urlFoto: 'https://4.bp.blogspot.com/-Lc0wsSOKqyY/WX-_tG2jJ5I/AAAAAAAAAI4/sWIQOcJ4-4UGGpMb9-djUwRSShZVPpIiwCLcBGAs/s1600/bin-Walther-Alvarenga.jpg',
-        //       id: 65,
-        //       likeada: true,
-        //       likers: [
-        //         {
-        //           id: 1,
-        //           login: 'alots',                  
-        //         }
-        //       ],
-        //       comentarios: [
-        //         {
-        //           id: 1,
-        //           login: 'alots',
-        //           texto: 'Muito top cara!'
-        //         },
-        //       ]
-        //     }
-        //   ]);
         console.error(err);
       });
   }
