@@ -38,4 +38,68 @@ export default class LogicaTimeLine {
                 console.error(err);
             });
     }
+
+
+    comenta(fotoId, comentario) {
+        const requestInfo = {
+            method: 'POST',
+            body: JSON.stringify({ texto: comentario }),
+            headers: new Headers({
+                'Content-type': 'application/json',
+            }),
+        };
+
+        fetch(`${Helper.urlApi}/fotos/${fotoId}/comment?${Helper.authToken}`, requestInfo)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Não foi possível comentar na foto');
+                }
+            })
+            .then(novoComentario => {
+                const fotoAchada = this.fotos.find(foto => foto.id === fotoId);
+                fotoAchada.comentarios.push(novoComentario);
+                
+                // atualiza timeline com novo array de fotos
+                PubSub.publish('timeline', this.fotos);
+            })
+            .catch(err => {
+                // fake comentario
+                // PubSub.publish('novos-comentarios', { fotoId: fotoId, novoComentario: { id: parseInt((Math.random() * 100), 10), login: 'Mr. Been', texto: comentario } });
+                console.error(err);
+            });
+    }
+
+
+    loadFotos(login) {
+        let urlPerfil;
+
+        if (login === undefined) {
+            urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}`;
+        } else {
+            urlPerfil = `${Helper.urlApi}/public/fotos/${login}`;
+        }
+
+        fetch(urlPerfil)
+            .then(response => response.json())
+            .then(fotos => {
+                if (Array.isArray(fotos)) {
+                    this.fotos = fotos;
+                    PubSub.publish('timeline', this.fotos);
+                } else {
+                    throw new Error(fotos);
+                }
+            })
+            .catch(err => {
+                console.error('Não foi possível carregar a timeline');
+                console.error(JSON.stringify(err.message));
+            });
+    }
+
+    subscribe(callback) {
+        PubSub.subscribe('timeline', (topico, fotos) => {
+            callback(fotos);
+        });
+    }
 }
