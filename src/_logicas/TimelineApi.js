@@ -73,23 +73,22 @@ export default class TimelineApi {
 
 
     static lista(login, store) {
-        // fetch(urlPerfil).then(response => response.json()).then(fotos => {
-        //     store.dispatch({ type: 'LISTAGEM', fotos });
-        // });
+        return dispatch => {
+            let urlPerfil;
 
-        let urlPerfil;
+            if (login === undefined) {
+                urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}`;
+            } else {
+                urlPerfil = `${Helper.urlApi}/public/fotos/${login}`;
+            }
 
-        if (login === undefined) {
-            urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}`;
-        } else {
-            urlPerfil = `${Helper.urlApi}/public/fotos/${login}`;
-        }
-
-        fetch(urlPerfil)
-            .then(response => response.json())
-            .then(fotos => {
-                store.dispatch({ type: 'LISTAGEM', fotos });
-            });
+            fetch(urlPerfil)
+                .then(response => response.json())
+                .then(fotos => {
+                    dispatch({ type: 'LISTAGEM', fotos });
+                    return fotos;
+                });
+        };
     }
 
     subscribe(callback) {

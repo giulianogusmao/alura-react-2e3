@@ -36,7 +36,7 @@ export default class Timeline extends Component {
     }
 
     carregaFotos() {
-        TimelineApi.lista(this.login, this.props.store);
+        this.props.store.dispatch(TimelineApi.lista(this.login));
     }
 
     _setFotos(fotos) {
