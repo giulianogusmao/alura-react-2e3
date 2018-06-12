@@ -1,7 +1,7 @@
 import Helper from '../_helper/helper';
 import PubSub from 'pubsub-js';
 
-export default class LogicaTimeLine {
+export default class TimelineApi {
 
     constructor(fotos) {
         this.fotos = [].concat(fotos);
@@ -60,7 +60,7 @@ export default class LogicaTimeLine {
             .then(novoComentario => {
                 const fotoAchada = this.fotos.find(foto => foto.id === fotoId);
                 fotoAchada.comentarios.push(novoComentario);
-                
+
                 // atualiza timeline com novo array de fotos
                 PubSub.publish('timeline', this.fotos);
             })
@@ -72,7 +72,11 @@ export default class LogicaTimeLine {
     }
 
 
-    loadFotos(login) {
+    static lista(login, store) {
+        // fetch(urlPerfil).then(response => response.json()).then(fotos => {
+        //     store.dispatch({ type: 'LISTAGEM', fotos });
+        // });
+
         let urlPerfil;
 
         if (login === undefined) {
@@ -84,16 +88,7 @@ export default class LogicaTimeLine {
         fetch(urlPerfil)
             .then(response => response.json())
             .then(fotos => {
-                if (Array.isArray(fotos)) {
-                    this.fotos = fotos;
-                    PubSub.publish('timeline', this.fotos);
-                } else {
-                    throw new Error(fotos);
-                }
-            })
-            .catch(err => {
-                console.error('Não foi possível carregar a timeline');
-                console.error(JSON.stringify(err.message));
+                store.dispatch({ type: 'LISTAGEM', fotos });
             });
     }
 

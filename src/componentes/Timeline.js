@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Foto from './Foto';
 import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
-import LogicaTimeLine from '../_logicas/LogicaTimeLine';
+import TimelineApi from '../_logicas/TimelineApi';
 
 export default class Timeline extends Component {
 
@@ -12,46 +12,46 @@ export default class Timeline extends Component {
         };
 
         this.login = this.props.login;
-        this.LogicaTimeLine = new LogicaTimeLine();
     }
 
     // dispara antes do componente ser instanciado
     componentWillMount() {
-        this.LogicaTimeLine.subscribe(fotos => {
-            this._setFotos(fotos);
+        // atualiza lista de fotos antes do componente ser renderizado
+        this.props.store.subscribe(() => {
+            this._setFotos(this.props.store.getState());
         });
     }
 
     // dispara quando o componete será instanciado
     componentDidMount() {
-        this._loadFotos();
+        this.carregaFotos();
     }
 
     // dispara quando uma propriedade é alterada
     componentWillReceiveProps(nextProps) {
         if (nextProps.login !== undefined) {
             this.login = nextProps.login;
-            this._loadFotos();
+            this.carregaFotos();
         }
     }
 
-    _loadFotos() {
-        this.LogicaTimeLine.loadFotos(this.login);
+    carregaFotos() {
+        TimelineApi.lista(this.login, this.props.store);
     }
 
     _setFotos(fotos) {
         this.setState({
             fotos: [].concat(fotos),
         });
-        this.LogicaTimeLine = new LogicaTimeLine(this.state.fotos);
+        // this.props.store = new TimelineApi(this.state.fotos);
     }
 
     like(fotoId) {
-        this.LogicaTimeLine.like(fotoId);
+        // this.props.store.like(fotoId);
     }
 
     comenta(fotoId, comentario) {
-        this.LogicaTimeLine.comenta(fotoId, comentario);
+        // this.props.store.comenta(fotoId, comentario);
     }
 
     render() {
