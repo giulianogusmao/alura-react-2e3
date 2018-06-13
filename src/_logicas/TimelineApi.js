@@ -1,4 +1,5 @@
 import Helper from '../_helper/helper';
+import { listagem, comentario, like } from '../_actions/actionCreator';
 
 export default class TimelineApi {
 
@@ -13,7 +14,7 @@ export default class TimelineApi {
                     }
                 })
                 .then(liker => {
-                    dispatch({ type: 'LIKE', fotoId, liker });
+                    dispatch(like(fotoId, liker));
                     return liker;
                 })
                 .catch(err => {
@@ -22,11 +23,11 @@ export default class TimelineApi {
         };
     }
 
-    static comenta(fotoId, comentario) {
+    static comenta(fotoId, textoComentario) {
         return dispatch => {
             const requestInfo = {
                 method: 'POST',
-                body: JSON.stringify({ texto: comentario }),
+                body: JSON.stringify({ texto: textoComentario }),
                 headers: new Headers({
                     'Content-type': 'application/json',
                 }),
@@ -41,7 +42,7 @@ export default class TimelineApi {
                     }
                 })
                 .then(novoComentario => {
-                    dispatch({ type: 'COMENTARIO', fotoId, novoComentario });
+                    dispatch(comentario(fotoId, novoComentario));
                     return novoComentario;
                 })
                 .catch(err => {
@@ -63,7 +64,7 @@ export default class TimelineApi {
             fetch(urlPerfil)
                 .then(response => response.json())
                 .then(fotos => {
-                    dispatch({ type: 'LISTAGEM', fotos });
+                    dispatch(listagem(fotos));
                     return fotos;
                 });
         };
