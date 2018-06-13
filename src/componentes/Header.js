@@ -1,25 +1,25 @@
 import React, { Component } from 'react';
-import Helper from '../_helper/helper';
+import TimelineApi from '../_logicas/TimelineApi';
 
 export default class Header extends Component {
 
+  constructor() {
+    super();
+
+    this.state = {
+      msg: '',
+    };
+  }
+
+  componentDidMount() {
+    this.props.store.subscribe(() => {
+      this.setState({ msg: this.props.store.getState().notificacao });
+    });
+  }
+
   pesquisa(event) {
     event.preventDefault();
-
-    fetch(`${Helper.urlApi}/public/fotos/${this.loginPesquisado.value}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Erro ao pesquisar');
-        }
-      }) 
-      .then(fotos => {
-        console.log(fotos);
-      })
-      .catch(err => {
-        console.error(err);
-      });
+    this.props.store.dispatch(TimelineApi.pesquisa(this.loginPesquisado.value));
   }
 
   render() {
@@ -27,11 +27,12 @@ export default class Header extends Component {
       <header className="header container">
         <h1 className="header-logo">
           Instalura
-          </h1>
+        </h1>
 
         <form className="header-busca" onSubmit={this.pesquisa.bind(this)}>
           <input type="text" name="search" placeholder="Pesquisa" className="header-busca-campo" ref={(input) => this.loginPesquisado = input} />
           <input type="submit" value="Buscar" className="header-busca-submit" />
+          <span>{ this.state.msg }</span>
         </form>
 
 

@@ -1,5 +1,10 @@
 import Helper from '../_helper/helper';
-import { listagem, comentario, like } from '../_actions/actionCreator';
+import { 
+    listagem,
+    comentario,
+    like,
+    notifica,
+} from '../_actions/actionCreator';
 
 export default class TimelineApi {
 
@@ -66,6 +71,27 @@ export default class TimelineApi {
                 .then(fotos => {
                     dispatch(listagem(fotos));
                     return fotos;
+                });
+        };
+    }
+
+    static pesquisa(login) {
+        return (dispatch) => {
+            fetch(`${Helper.urlApi}/public/fotos/${login}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Erro ao pesquisar');
+                    }
+                })
+                .then(fotos => {
+                    dispatch(notifica((fotos.length === 0) ? 'Usuário não encontrado' : ''));
+                    dispatch(listagem(fotos));
+                    return fotos;
+                })
+                .catch(err => {
+                    console.error(err);
                 });
         };
     }

@@ -18,7 +18,7 @@ export default class Timeline extends Component {
     componentWillMount() {
         // atualiza lista de fotos antes do componente ser renderizado
         this.props.store.subscribe(() => {
-            this._setFotos(this.props.store.getState());
+            this._setFotos(this.props.store.getState().timeline);
         });
     }
 
