@@ -10,20 +10,10 @@ export default class TimelineApi {
 
     static like(fotoId) {
         return dispatch => {
-            fetch(`${Helper.urlApi}/fotos/${fotoId}/like?${Helper.authToken}`, { method: 'POST' })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Não foi possível realizar o like da foto')
-                    }
-                })
+            Helper.api(`/fotos/${fotoId}/like?${Helper.authToken}`, 'Não foi possível realizar o like da foto', { method: 'POST' })
                 .then(liker => {
                     dispatch(like(fotoId, liker));
                     return liker;
-                })
-                .catch(err => {
-                    console.error(err);
                 });
         };
     }
@@ -38,20 +28,10 @@ export default class TimelineApi {
                 }),
             };
 
-            fetch(`${Helper.urlApi}/fotos/${fotoId}/comment?${Helper.authToken}`, requestInfo)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Não foi possível comentar na foto');
-                    }
-                })
+            Helper.api(`/fotos/${fotoId}/comment?${Helper.authToken}`, 'Não foi possível comentar na foto', requestInfo)
                 .then(novoComentario => {
                     dispatch(comentario(fotoId, novoComentario));
                     return novoComentario;
-                })
-                .catch(err => {
-                    console.error(err);
                 });
         };
     }
@@ -61,13 +41,12 @@ export default class TimelineApi {
             let urlPerfil;
 
             if (login === undefined) {
-                urlPerfil = `${Helper.urlApi}/fotos?${Helper.authToken}`;
+                urlPerfil = `/fotos?${Helper.authToken}`;
             } else {
-                urlPerfil = `${Helper.urlApi}/public/fotos/${login}`;
+                urlPerfil = `/public/fotos/${login}`;
             }
 
-            fetch(urlPerfil)
-                .then(response => response.json())
+            Helper.api(urlPerfil, 'Não foi possível carregar a timeline')
                 .then(fotos => {
                     dispatch(listagem(fotos));
                     return fotos;
@@ -77,21 +56,11 @@ export default class TimelineApi {
 
     static pesquisa(login) {
         return (dispatch) => {
-            fetch(`${Helper.urlApi}/public/fotos/${login}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Erro ao pesquisar');
-                    }
-                })
+            Helper.api(`/public/fotos/${login}`, 'Erro ao pesquisar')
                 .then(fotos => {
                     dispatch(notifica((fotos.length === 0) ? 'Usuário não encontrado' : ''));
                     dispatch(listagem(fotos));
                     return fotos;
-                })
-                .catch(err => {
-                    console.error(err);
                 });
         };
     }

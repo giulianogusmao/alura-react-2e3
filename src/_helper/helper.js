@@ -6,10 +6,6 @@ export default class Helper {
         throw new Error('Classe Helper não deve ser instanciada');
     }
 
-    static get urlApi() {
-        return this._urlApi;
-    }
-
     static get authToken() {
         return `X-AUTH-TOKEN=${localStorage.getItem(this._authToken)}`;
     }
@@ -20,5 +16,29 @@ export default class Helper {
         } else {
             throw new Error('Nenhum token definido');
         }
+    }
+
+    static api(requestUrl, msgError = '', requestInfo = { method: 'GET' }) {
+        const url = this._urlApi + requestUrl;
+
+        return new Promise(
+            (resolve, reject) => {
+                fetch(url, requestInfo)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw response.status;
+                        }
+                    })
+                    .then(value => 
+                        resolve(value)
+                    )
+                    .catch(err => {
+                        console.error(`${url}, Status Error: ${err}, Message: ${msgError}`);
+                        reject(msgError);
+                    });
+            }
+        );
     }
 }
