@@ -1,32 +1,24 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import Header from './componentes/Header';
 import Timeline from './componentes/Timeline';
-import { 
-  createStore,
-  applyMiddleware,
-  combineReducers
-} from 'redux';
-import thunkMiddleware from 'redux-thunk';
-import { timeline } from './_reducers/timeline';
-import { notificacao } from './_reducers/header';
-
-const reducers = combineReducers({
-  timeline, notificacao
-});
-const store = createStore(reducers, applyMiddleware(thunkMiddleware));
 
 class App extends Component {
   render() {
     return (
       <div id="root">
         <div className="main">
-          <Header store={store} />
-          <Timeline login={this.props.params.login} store={store} />
+          <Header />
+          <Timeline login={this.props.params.login} />
         </div>
       </div>
     );
   }
+}
+
+App.contextTypes = {
+  store: PropTypes.object.isRequired
 }
 
 export default App;

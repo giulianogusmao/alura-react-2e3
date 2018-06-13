@@ -1,25 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import TimelineApi from '../_logicas/TimelineApi';
 
-export default class Header extends Component {
-
-  constructor() {
-    super();
-
-    this.state = {
-      msg: '',
-    };
-  }
-
-  componentDidMount() {
-    this.props.store.subscribe(() => {
-      this.setState({ msg: this.props.store.getState().notificacao });
-    });
-  }
+class Header extends Component {
 
   pesquisa(event) {
     event.preventDefault();
-    this.props.store.dispatch(TimelineApi.pesquisa(this.loginPesquisado.value));
+    this.props.pesquisa(this.loginPesquisado.value);
   }
 
   render() {
@@ -32,9 +19,8 @@ export default class Header extends Component {
         <form className="header-busca" onSubmit={this.pesquisa.bind(this)}>
           <input type="text" name="search" placeholder="Pesquisa" className="header-busca-campo" ref={(input) => this.loginPesquisado = input} />
           <input type="submit" value="Buscar" className="header-busca-submit" />
-          <span>{ this.state.msg }</span>
+          <span>{this.props.msg}</span>
         </form>
-
 
         <nav>
           <ul className="header-nav">
@@ -51,3 +37,19 @@ export default class Header extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return { msg: state.notificacao }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    pesquisa: (loginPesquisado) => {
+      dispatch(TimelineApi.pesquisa(loginPesquisado));
+    },
+  }
+}
+
+const HeaderConatiner = connect(mapStateToProps, mapDispatchToProps)(Header);
+
+export default HeaderConatiner;
